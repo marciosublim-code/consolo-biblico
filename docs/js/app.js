@@ -7,12 +7,33 @@ const chips = document.querySelectorAll(".chip");
 const estadoVazio = document.getElementById("estado-vazio");
 
 let BIBLIA = null;
+let INDICE = null;
+
+const PARADAS = new Set(
+  `de da do das dos e a o as os que em um uma para com se na no nas nos por como mas ao aos
+   foi ser seu sua seus suas eu tu ele ela nos vos eles elas me te lhe lhes meu minha teu tua
+   nosso nossa isso isto aquilo tambem ja mais muito muita muitos muitas nao sim sobre entre ate
+   desde quando onde porque pois entao assim tudo nada todo toda todos todas este esta estes estas
+   esse essa esses essas aquele aquela aqueles aquelas apos ainda so aqui ali la
+   seja sejam sao era eram sera serao tem tinha tinham havia ha estou estava sinto sentindo`
+    .split(/\s+/)
+    .filter(Boolean)
+);
 
 async function carregarBiblia() {
   if (BIBLIA) return BIBLIA;
   const resp = await fetch("data/biblia.json");
   BIBLIA = await resp.json();
   return BIBLIA;
+}
+
+// Carregado só quando nenhum tema bate com o texto — evita baixar
+// mais dados do que o necessário na primeira visita.
+async function carregarIndice() {
+  if (INDICE) return INDICE;
+  const resp = await fetch("data/indice.json");
+  INDICE = await resp.json();
+  return INDICE;
 }
 
 function normalizar(texto) {
@@ -27,6 +48,52 @@ function normalizar(texto) {
 
 function encontrarCrise(textoNormalizado) {
   return ALERTA_CRISE.palavras.some((p) => textoNormalizado.includes(normalizar(p)));
+}
+
+// Busca full-text nos 31 mil versículos: usada quando nenhum tema
+// bate com o texto digitado. Pontua cada versículo pela quantidade de
+// palavras da busca que aparecem nele, dando mais peso a palavras raras.
+async function buscarPorTextoLivre(textoNormalizado) {
+  const indice = await carregarIndice();
+  const biblia = await carregarBiblia();
+
+  const palavras = textoNormalizado
+    .split(" ")
+    .filter((p) => p.length >= 3 && !PARADAS.has(p));
+
+  if (palavras.length === 0) return [];
+
+  const pontos = new Map(); // id do versículo -> peso acumulado
+  const distintas = new Map(); // id do versículo -> nº de palavras diferentes que bateram
+
+  palavras.forEach((p) => {
+    const postagens = indice.index[p];
+    if (!postagens) return;
+    const peso = 1 / Math.log2(2 + postagens.length);
+    postagens.forEach((i) => {
+      pontos.set(i, (pontos.get(i) || 0) + peso);
+      distintas.set(i, (distintas.get(i) || 0) + 1);
+    });
+  });
+
+  // Prioriza versículos que batem em mais palavras diferentes da busca —
+  // isso evita que um único termo raro domine o resultado sozinho.
+  const ranqueados = [...pontos.entries()]
+    .sort((a, b) => {
+      const diff = distintas.get(b[0]) - distintas.get(a[0]);
+      return diff !== 0 ? diff : b[1] - a[1];
+    })
+    .slice(0, 6);
+
+  return ranqueados
+    .map(([i]) => {
+      const [abrev, cap, vers] = indice.refs[i];
+      return { l: abrev, c: cap, v1: vers, v2: vers };
+    })
+    .filter((ref) => {
+      const livro = biblia.livros[ref.l];
+      return livro && livro.capitulos[ref.c - 1] && livro.capitulos[ref.c - 1][ref.v1 - 1];
+    });
 }
 
 function pontuarTemas(textoNormalizado) {
@@ -142,7 +209,21 @@ async function buscar(textoOriginal) {
     const escolhidos = pontuados.filter((p) => p.pontos >= melhorPontuacao).slice(0, 2);
     escolhidos.forEach(({ tema }) => blocos.push(criarBlocoTema(biblia, tema)));
   } else {
-    blocos.push(criarBlocoTema(biblia, TEMA_GERAL));
+    // Nenhum tema bateu: tenta achar versículos relevantes buscando
+    // as palavras digitadas no texto completo da Bíblia antes de
+    // cair no conjunto genérico de conforto.
+    const referenciasEncontradas = await buscarPorTextoLivre(textoNormalizado);
+    if (referenciasEncontradas.length > 0) {
+      blocos.push(
+        criarBlocoTema(biblia, {
+          rotulo: "Encontrado no texto",
+          introducao: "Não achei um tema exato, mas essas passagens usam palavras parecidas com o que você escreveu.",
+          referencias: referenciasEncontradas,
+        })
+      );
+    } else {
+      blocos.push(criarBlocoTema(biblia, TEMA_GERAL));
+    }
   }
 
   resultados.setAttribute("aria-busy", "false");
