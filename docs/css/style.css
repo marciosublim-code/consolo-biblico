@@ -1,0 +1,335 @@
+:root {
+  --bg: #12172c;
+  --bg-glow: #1c2344;
+  --painel: #1b2140;
+  --painel-borda: #2b3260;
+  --creme: #f3ecd9;
+  --creme-suave: #cdc6ae;
+  --ouro: #c9a24b;
+  --ouro-suave: #e3c785;
+  --ember: #c97b63;
+  --foco: #e3c785;
+
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans: "Public Sans", "Segoe UI", sans-serif;
+
+  --raio: 18px;
+  --raio-pequeno: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(120% 90% at 50% -10%, var(--bg-glow) 0%, var(--bg) 55%);
+  color: var(--creme);
+  font-family: var(--sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.envolucro {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vw, 64px) 20px 80px;
+}
+
+/* ---------- Cabeçalho / hero ---------- */
+
+.cabecalho {
+  text-align: center;
+  margin-bottom: clamp(28px, 5vw, 48px);
+}
+
+.eyebrow {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ouro-suave);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+
+.titulo {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.7rem, 5.4vw, 2.5rem);
+  line-height: 1.25;
+  margin: 0 0 14px;
+  color: var(--creme);
+}
+
+.subtitulo {
+  font-family: var(--sans);
+  color: var(--creme-suave);
+  font-size: 0.98rem;
+  max-width: 46ch;
+  margin: 0 auto;
+}
+
+/* ---------- Área da vela (input) ---------- */
+
+.area-vela {
+  position: relative;
+  padding: clamp(22px, 5vw, 34px);
+  border-radius: var(--raio);
+  background: linear-gradient(180deg, var(--painel) 0%, rgba(27, 33, 64, 0.4) 100%);
+  border: 1px solid var(--painel-borda);
+  overflow: hidden;
+}
+
+.brilho-vela {
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  width: 340px;
+  height: 340px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(201, 162, 75, 0.35) 0%, rgba(201, 162, 75, 0) 70%);
+  pointer-events: none;
+  animation: respirar 4.5s ease-in-out infinite;
+}
+
+@keyframes respirar {
+  0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.95; transform: translateX(-50%) scale(1.08); }
+}
+
+.form-busca {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+label[for="campo-sentimento"] {
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  color: var(--creme-suave);
+}
+
+textarea#campo-sentimento {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  padding: 14px 16px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--painel-borda);
+  background: rgba(10, 13, 28, 0.55);
+  color: var(--creme);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+textarea#campo-sentimento::placeholder {
+  color: rgba(243, 236, 217, 0.38);
+}
+
+textarea#campo-sentimento:focus-visible,
+button:focus-visible,
+.chip:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.botao-buscar {
+  align-self: flex-end;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1b1608;
+  background: linear-gradient(180deg, var(--ouro-suave), var(--ouro));
+  border: none;
+  padding: 12px 26px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.botao-buscar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(201, 162, 75, 0.25);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.chip {
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--creme-suave);
+  background: rgba(243, 236, 217, 0.06);
+  border: 1px solid var(--painel-borda);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--ouro-suave);
+  color: var(--creme);
+}
+
+/* ---------- Ornamento divisor ---------- */
+
+.ornamento {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 40px 0 8px;
+  color: var(--painel-borda);
+}
+
+.ornamento::before,
+.ornamento::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--painel-borda);
+}
+
+.ornamento svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ouro-suave);
+  opacity: 0.8;
+}
+
+/* ---------- Resultados ---------- */
+
+#resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.estado-vazio {
+  text-align: center;
+  color: var(--creme-suave);
+  font-size: 0.92rem;
+  padding: 18px 8px 4px;
+}
+
+.bloco-tema {
+  animation: surgir 0.5s ease both;
+}
+
+@keyframes surgir {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bloco-eyebrow {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ouro-suave);
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.bloco-intro {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.12rem;
+  color: var(--creme);
+  margin: 0 0 18px;
+}
+
+.bloco-tema--crise .bloco-eyebrow {
+  color: var(--ember);
+}
+
+.aviso-crise {
+  background: rgba(201, 123, 99, 0.12);
+  border: 1px solid rgba(201, 123, 99, 0.4);
+  border-radius: var(--raio-pequeno);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  font-size: 0.94rem;
+  color: var(--creme);
+}
+
+.aviso-crise p {
+  margin: 0 0 8px;
+}
+
+.aviso-crise p:last-child {
+  margin-bottom: 0;
+}
+
+.aviso-crise a {
+  color: var(--ouro-suave);
+}
+
+.lista-versiculos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cartao-versiculo {
+  background: var(--painel);
+  border: 1px solid var(--painel-borda);
+  border-left: 3px solid var(--ouro);
+  border-radius: var(--raio-pequeno);
+  padding: 16px 18px;
+}
+
+.cartao-referencia {
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ouro-suave);
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.cartao-texto {
+  font-family: var(--serif);
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--creme);
+  margin: 0;
+}
+
+/* ---------- Rodapé ---------- */
+
+.rodape {
+  margin-top: 56px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(205, 198, 174, 0.55);
+}
+
+.rodape a {
+  color: var(--creme-suave);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brilho-vela,
+  .bloco-tema {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "consolo-biblico",
+  "version": "1.0.0",
+  "description": "Buscador de conforto na Bíblia baseado em como você está se sentindo",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "importar": "node scripts/1-importar-biblia.js",
+    "buscar": "node scripts/2-buscar-conforto.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0"
+  }
+}
